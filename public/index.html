@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrderFlow — Hardware Store & Admin Order Management</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-badge">OF</div>
+      <div>
+        <h1 class="brand-title">OrderFlow</h1>
+        <p class="brand-tagline">Mini E-Commerce & Order Management</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="status-pill" id="viewIndicator">🟢 Storefront Active</span>
+      <button class="cart-btn" id="cartBtn" title="View Cart">
+        <span>🛒 Cart</span>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="admin-nav-btn" id="portalToggleBtn">🛡️ Admin Portal</button>
+    </div>
+  </header>
+
+  <!-- STOREFRONT VIEW -->
+  <main class="main-container" id="storefrontView">
+    <!-- Hero Banner -->
+    <section class="hero-section">
+      <div class="hero-badge">WEEK 03 GUIDED PROJECT • DAY 4 ADMIN LIFECYCLE</div>
+      <h2 class="hero-title">Curated Hardware Storefront with Complete Order Lifecycle</h2>
+      <p class="hero-desc">Explore high-performance desktop gear. All stock counts, order items, and pricing are validated and persisted in SQLite with state-machine order management.</p>
+      <div class="hero-metrics">
+        <div class="metric-card">
+          <span class="metric-val" id="totalProductsCount">6</span>
+          <span class="metric-lbl">ACTIVE PRODUCTS</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-val">SQLite</span>
+          <span class="metric-lbl">PERSISTENT DB</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-val">State Machine</span>
+          <span class="metric-lbl">LIFECYCLE CONTROL</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalog Section -->
+    <section class="catalog-section">
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">Featured Product Catalog</h3>
+          <p class="section-subtitle">Browse available hardware. Click any item to inspect specifications and live inventory.</p>
+        </div>
+      </div>
+      <div class="product-grid" id="productGrid">
+        <div class="loading-state">Loading catalog from database...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ADMIN PORTAL VIEW -->
+  <main class="main-container hidden" id="adminView">
+    <section class="admin-hero">
+      <div class="hero-badge">ADMIN CONTROL PANEL • DAY 4 EVIDENCE</div>
+      <h2 class="hero-title">Order Lifecycle & Reliability Management</h2>
+      <p class="hero-desc">Transition customer orders through strict lifecycle states: <code>Pending</code> ➔ <code>Confirmed</code> ➔ <code>Fulfilled</code> or <code>Cancelled</code>. Cancellations automatically restore stock to database inventory.</p>
+      
+      <!-- Admin Quick Stats -->
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <span class="stat-number" id="adminTotalOrders">0</span>
+          <span class="stat-label">TOTAL ORDERS</span>
+        </div>
+        <div class="admin-stat-card">
+          <span class="stat-number stat-pending" id="adminPendingOrders">0</span>
+          <span class="stat-label">PENDING REVIEW</span>
+        </div>
+        <div class="admin-stat-card">
+          <span class="stat-number stat-fulfilled" id="adminFulfilledOrders">0</span>
+          <span class="stat-label">FULFILLED</span>
+        </div>
+        <div class="admin-stat-card">
+          <span class="stat-number stat-revenue" id="adminTotalRevenue">$0.00</span>
+          <span class="stat-label">TOTAL REVENUE</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Interactive Reliability Tests -->
+    <section class="admin-section">
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">🧪 Reliability & Security Test Suite</h3>
+          <p class="section-subtitle">Run automated error-case tests against server endpoints to generate Day 4 reliability evidence.</p>
+        </div>
+      </div>
+      <div class="test-cards-grid">
+        <div class="test-card">
+          <div class="test-header">
+            <h4>Test 1: Insufficient Stock Rejection</h4>
+            <span class="test-type">400 Validation</span>
+          </div>
+          <p class="test-desc">Simulates placing an order for 999 units of an item with only limited inventory.</p>
+          <button class="test-btn" id="runStockTestBtn">Run Stock Limit Test</button>
+          <div class="test-result-box hidden" id="stockTestResult"></div>
+        </div>
+
+        <div class="test-card">
+          <div class="test-header">
+            <h4>Test 2: Price Tampering Defense</h4>
+            <span class="test-type">Integrity Check</span>
+          </div>
+          <p class="test-desc">Simulates a malicious client sending an altered client-price ($1.00) for a $129.00 item.</p>
+          <button class="test-btn" id="runPriceTestBtn">Run Price Integrity Test</button>
+          <div class="test-result-box hidden" id="priceTestResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Orders Table -->
+    <section class="admin-section">
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">Customer Orders & State Machine Transitions</h3>
+          <p class="section-subtitle">Manage valid transitions. Terminal states (Fulfilled / Cancelled) are strictly locked.</p>
+        </div>
+        <button class="refresh-btn" id="refreshOrdersBtn">🔄 Refresh Orders</button>
+      </div>
+      <div class="orders-table-wrapper" id="ordersTableWrapper">
+        <div class="loading-state">Loading orders from database...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Product Detail Modal -->
+  <div class="modal-overlay hidden" id="productModal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Cart & Checkout Drawer Modal -->
+  <div class="modal-overlay hidden" id="cartModal">
+    <div class="cart-drawer">
+      <div class="drawer-header">
+        <div>
+          <h3 class="drawer-title">Shopping Cart</h3>
+          <p class="drawer-subtitle">Review quantities and subtotal before placing your order.</p>
+        </div>
+        <button class="modal-close-btn" id="cartCloseBtn">&times;</button>
+      </div>
+
+      <div class="drawer-content">
+        <!-- Cart Items List -->
+        <div class="cart-items-container" id="cartItemsContainer"></div>
+
+        <!-- Checkout Form Section -->
+        <div class="checkout-section hidden" id="checkoutSection">
+          <h4 class="checkout-title">Customer Shipping & Contact</h4>
+          <form id="checkoutForm" class="checkout-form">
+            <div class="form-group">
+              <label for="custName">Full Name *</label>
+              <input type="text" id="custName" required placeholder="e.g. Zikriya Khan">
+            </div>
+            <div class="form-group">
+              <label for="custEmail">Email Address *</label>
+              <input type="email" id="custEmail" required placeholder="e.g. zikriya@example.com">
+            </div>
+            <div class="form-group">
+              <label for="custAddress">Delivery Address *</label>
+              <textarea id="custAddress" required rows="2" placeholder="Street, City, Postal Code"></textarea>
+            </div>
+          </form>
+        </div>
+
+        <!-- Order Result Box -->
+        <div class="order-result-box hidden" id="orderResultBox"></div>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="drawer-footer" id="drawerFooter">
+        <div class="subtotal-row">
+          <span>Calculated Subtotal:</span>
+          <span class="subtotal-val" id="cartSubtotal">$0.00</span>
+        </div>
+        <button class="checkout-btn" id="submitOrderBtn" disabled>Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
