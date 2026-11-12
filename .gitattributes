@@ -1,0 +1,9 @@
+* text=auto
+
+# Keep shell scripts LF so they work on macOS/Linux checkouts.
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Binary/runtime artifacts
+*.db binary
+*.svg text

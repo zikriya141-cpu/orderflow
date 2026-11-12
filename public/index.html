@@ -3,202 +3,228 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OrderFlow — Hardware Store & Admin Order Management</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="OrderFlow — a compact e-commerce storefront and admin order management console built with Node.js, Express and SQLite.">
+  <meta name="theme-color" content="#0b0f17">
+  <title>OrderFlow — Storefront &amp; Order Management</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
 </head>
 <body>
+
+  <noscript>
+    <div class="noscript-banner">OrderFlow needs JavaScript enabled to load the catalog and process orders.</div>
+  </noscript>
 
   <!-- App Header -->
   <header class="app-header">
     <div class="header-left">
-      <div class="brand-badge">OF</div>
+      <div class="brand-badge" aria-hidden="true">OF</div>
       <div>
         <h1 class="brand-title">OrderFlow</h1>
-        <p class="brand-tagline">Mini E-Commerce & Order Management</p>
+        <p class="brand-tagline">Storefront &amp; Order Management</p>
       </div>
     </div>
     <div class="header-right">
-      <span class="status-pill" id="viewIndicator">🟢 Storefront Active</span>
-      <button class="cart-btn" id="cartBtn" title="View Cart">
-        <span>🛒 Cart</span>
+      <span class="status-pill" id="viewIndicator">Storefront</span>
+      <button class="cart-btn" id="cartBtn" type="button" aria-haspopup="dialog" aria-controls="cartModal">
+        <span aria-hidden="true">🛒</span>
+        <span>Cart</span>
         <span class="cart-count" id="cartCount">0</span>
       </button>
-      <button class="admin-nav-btn" id="portalToggleBtn">🛡️ Admin Portal</button>
+      <button class="admin-nav-btn" id="portalToggleBtn" type="button">Admin Portal</button>
     </div>
   </header>
 
   <!-- STOREFRONT VIEW -->
   <main class="main-container" id="storefrontView">
-    <!-- Hero Banner -->
     <section class="hero-section">
-      <div class="hero-badge">WEEK 03 GUIDED PROJECT • DAY 4 ADMIN LIFECYCLE</div>
-      <h2 class="hero-title">Curated Hardware Storefront with Complete Order Lifecycle</h2>
-      <p class="hero-desc">Explore high-performance desktop gear. All stock counts, order items, and pricing are validated and persisted in SQLite with state-machine order management.</p>
+      <p class="hero-badge">HARDWARE STOREFRONT</p>
+      <h2 class="hero-title">Performance hardware, with inventory you can trust.</h2>
+      <p class="hero-desc">
+        Explore a focused catalog of desktop gear. Every price and stock level is validated
+        server-side and persisted in SQLite, so what you see is what the order engine enforces.
+      </p>
       <div class="hero-metrics">
         <div class="metric-card">
-          <span class="metric-val" id="totalProductsCount">6</span>
+          <span class="metric-val" id="totalProductsCount">—</span>
           <span class="metric-lbl">ACTIVE PRODUCTS</span>
         </div>
         <div class="metric-card">
           <span class="metric-val">SQLite</span>
-          <span class="metric-lbl">PERSISTENT DB</span>
+          <span class="metric-lbl">PERSISTENT STORAGE</span>
         </div>
         <div class="metric-card">
-          <span class="metric-val">State Machine</span>
-          <span class="metric-lbl">LIFECYCLE CONTROL</span>
+          <span class="metric-val">Server-side</span>
+          <span class="metric-lbl">PRICE &amp; STOCK VALIDATION</span>
         </div>
       </div>
     </section>
 
-    <!-- Catalog Section -->
-    <section class="catalog-section">
+    <section class="catalog-section" aria-labelledby="catalogTitle">
       <div class="section-header">
         <div>
-          <h3 class="section-title">Featured Product Catalog</h3>
-          <p class="section-subtitle">Browse available hardware. Click any item to inspect specifications and live inventory.</p>
+          <h3 class="section-title" id="catalogTitle">Featured catalog</h3>
+          <p class="section-subtitle">Click any product to inspect its specification sheet and live inventory.</p>
         </div>
       </div>
       <div class="product-grid" id="productGrid">
-        <div class="loading-state">Loading catalog from database...</div>
+        <div class="loading-state">Loading catalog…</div>
       </div>
     </section>
   </main>
 
   <!-- ADMIN PORTAL VIEW -->
-  <main class="main-container hidden" id="adminView">
+  <main class="main-container hidden" id="adminView" aria-hidden="true">
     <section class="admin-hero">
-      <div class="hero-badge">ADMIN CONTROL PANEL • DAY 4 EVIDENCE</div>
-      <h2 class="hero-title">Order Lifecycle & Reliability Management</h2>
-      <p class="hero-desc">Transition customer orders through strict lifecycle states: <code>Pending</code> ➔ <code>Confirmed</code> ➔ <code>Fulfilled</code> or <code>Cancelled</code>. Cancellations automatically restore stock to database inventory.</p>
-      
-      <!-- Admin Quick Stats -->
+      <p class="hero-badge">ADMIN CONSOLE</p>
+      <h2 class="hero-title">Order operations &amp; lifecycle control</h2>
+      <p class="hero-desc">
+        Review incoming orders and move them through <code>Pending</code> → <code>Confirmed</code> →
+        <code>Fulfilled</code>. Cancelling an order automatically restores its reserved stock.
+      </p>
+
       <div class="admin-stats-grid">
         <div class="admin-stat-card">
-          <span class="stat-number" id="adminTotalOrders">0</span>
+          <span class="stat-number" id="adminTotalOrders">—</span>
           <span class="stat-label">TOTAL ORDERS</span>
         </div>
         <div class="admin-stat-card">
-          <span class="stat-number stat-pending" id="adminPendingOrders">0</span>
+          <span class="stat-number stat-pending" id="adminPendingOrders">—</span>
           <span class="stat-label">PENDING REVIEW</span>
         </div>
         <div class="admin-stat-card">
-          <span class="stat-number stat-fulfilled" id="adminFulfilledOrders">0</span>
+          <span class="stat-number stat-fulfilled" id="adminFulfilledOrders">—</span>
           <span class="stat-label">FULFILLED</span>
         </div>
         <div class="admin-stat-card">
-          <span class="stat-number stat-revenue" id="adminTotalRevenue">$0.00</span>
-          <span class="stat-label">TOTAL REVENUE</span>
+          <span class="stat-number stat-revenue" id="adminTotalRevenue">—</span>
+          <span class="stat-label">REVENUE (NON-CANCELLED)</span>
         </div>
       </div>
     </section>
 
-    <!-- Admin Interactive Reliability Tests -->
-    <section class="admin-section">
+    <section class="admin-section" aria-labelledby="diagnosticsTitle">
       <div class="section-header">
         <div>
-          <h3 class="section-title">🧪 Reliability & Security Test Suite</h3>
-          <p class="section-subtitle">Run automated error-case tests against server endpoints to generate Day 4 reliability evidence.</p>
+          <h3 class="section-title" id="diagnosticsTitle">System diagnostics</h3>
+          <p class="section-subtitle">Live health of the API, database connection and running build.</p>
         </div>
+        <button class="refresh-btn" type="button" data-action="refresh-diagnostics">Refresh status</button>
       </div>
-      <div class="test-cards-grid">
-        <div class="test-card">
-          <div class="test-header">
-            <h4>Test 1: Insufficient Stock Rejection</h4>
-            <span class="test-type">400 Validation</span>
-          </div>
-          <p class="test-desc">Simulates placing an order for 999 units of an item with only limited inventory.</p>
-          <button class="test-btn" id="runStockTestBtn">Run Stock Limit Test</button>
-          <div class="test-result-box hidden" id="stockTestResult"></div>
-        </div>
 
-        <div class="test-card">
-          <div class="test-header">
-            <h4>Test 2: Price Tampering Defense</h4>
-            <span class="test-type">Integrity Check</span>
-          </div>
-          <p class="test-desc">Simulates a malicious client sending an altered client-price ($1.00) for a $129.00 item.</p>
-          <button class="test-btn" id="runPriceTestBtn">Run Price Integrity Test</button>
-          <div class="test-result-box hidden" id="priceTestResult"></div>
+      <div class="diagnostics-grid">
+        <div class="diag-item">
+          <span class="diag-label">API STATUS</span>
+          <span class="diag-value" id="diagApi">Checking…</span>
+        </div>
+        <div class="diag-item">
+          <span class="diag-label">DATABASE</span>
+          <span class="diag-value" id="diagDatabase">Checking…</span>
+        </div>
+        <div class="diag-item">
+          <span class="diag-label">VERSION</span>
+          <span class="diag-value" id="diagVersion">—</span>
+        </div>
+        <div class="diag-item">
+          <span class="diag-label">UPTIME</span>
+          <span class="diag-value" id="diagUptime">—</span>
         </div>
       </div>
     </section>
 
-    <!-- Admin Orders Table -->
-    <section class="admin-section">
+    <section class="admin-section" aria-labelledby="ordersTitle">
       <div class="section-header">
         <div>
-          <h3 class="section-title">Customer Orders & State Machine Transitions</h3>
-          <p class="section-subtitle">Manage valid transitions. Terminal states (Fulfilled / Cancelled) are strictly locked.</p>
+          <h3 class="section-title" id="ordersTitle">Orders &amp; lifecycle transitions</h3>
+          <p class="section-subtitle">Terminal states are locked. Cancellations restore inventory exactly once.</p>
         </div>
-        <button class="refresh-btn" id="refreshOrdersBtn">🔄 Refresh Orders</button>
+        <button class="refresh-btn" type="button" data-action="refresh-orders">Refresh orders</button>
       </div>
+
+      <div class="admin-toolbar">
+        <label class="sr-only" for="orderSearch">Search orders</label>
+        <input class="filter-input" id="orderSearch" type="search" placeholder="Search by reference, customer or email…" autocomplete="off">
+        <label class="sr-only" for="statusFilter">Filter by status</label>
+        <select class="filter-select" id="statusFilter">
+          <option value="all">All statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Fulfilled">Fulfilled</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+
       <div class="orders-table-wrapper" id="ordersTableWrapper">
-        <div class="loading-state">Loading orders from database...</div>
+        <div class="loading-state">Loading orders…</div>
       </div>
     </section>
   </main>
 
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <p><strong>OrderFlow</strong> v1.0.0 · Node.js · Express · SQLite</p>
+      <p>Built by Zikriya Khan · <a href="/api/health">API health</a></p>
+    </div>
+  </footer>
+
   <!-- Product Detail Modal -->
-  <div class="modal-overlay hidden" id="productModal">
+  <div class="modal-overlay hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle" aria-hidden="true">
     <div class="modal-card">
-      <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+      <button class="modal-close-btn" id="modalCloseBtn" type="button" aria-label="Close product details">&times;</button>
       <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
 
-  <!-- Cart & Checkout Drawer Modal -->
-  <div class="modal-overlay hidden" id="cartModal">
+  <!-- Cart & Checkout Drawer -->
+  <div class="modal-overlay hidden" id="cartModal" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
     <div class="cart-drawer">
       <div class="drawer-header">
         <div>
-          <h3 class="drawer-title">Shopping Cart</h3>
+          <h3 class="drawer-title" id="cartTitle">Shopping cart</h3>
           <p class="drawer-subtitle">Review quantities and subtotal before placing your order.</p>
         </div>
-        <button class="modal-close-btn" id="cartCloseBtn">&times;</button>
+        <button class="modal-close-btn" id="cartCloseBtn" type="button" aria-label="Close cart">&times;</button>
       </div>
 
       <div class="drawer-content">
-        <!-- Cart Items List -->
         <div class="cart-items-container" id="cartItemsContainer"></div>
 
-        <!-- Checkout Form Section -->
         <div class="checkout-section hidden" id="checkoutSection">
-          <h4 class="checkout-title">Customer Shipping & Contact</h4>
+          <h4 class="checkout-title">Shipping details</h4>
+          <p class="form-hint">Demo checkout — no payment is collected and nothing is shipped.</p>
           <form id="checkoutForm" class="checkout-form">
             <div class="form-group">
-              <label for="custName">Full Name *</label>
-              <input type="text" id="custName" required placeholder="e.g. Zikriya Khan">
+              <label for="custName">Full name</label>
+              <input type="text" id="custName" name="name" required minlength="2" maxlength="100" autocomplete="name" placeholder="e.g. Zikriya Khan">
             </div>
             <div class="form-group">
-              <label for="custEmail">Email Address *</label>
-              <input type="email" id="custEmail" required placeholder="e.g. zikriya@example.com">
+              <label for="custEmail">Email address</label>
+              <input type="email" id="custEmail" name="email" required maxlength="254" autocomplete="email" placeholder="e.g. zikriya@example.com">
             </div>
             <div class="form-group">
-              <label for="custAddress">Delivery Address *</label>
-              <textarea id="custAddress" required rows="2" placeholder="Street, City, Postal Code"></textarea>
+              <label for="custAddress">Delivery address</label>
+              <textarea id="custAddress" name="address" required minlength="5" maxlength="300" rows="2" autocomplete="street-address" placeholder="Street, city, postal code"></textarea>
             </div>
           </form>
         </div>
 
-        <!-- Order Result Box -->
         <div class="order-result-box hidden" id="orderResultBox"></div>
       </div>
 
-      <!-- Drawer Footer -->
       <div class="drawer-footer" id="drawerFooter">
         <div class="subtotal-row">
-          <span>Calculated Subtotal:</span>
+          <span>Calculated subtotal</span>
           <span class="subtotal-val" id="cartSubtotal">$0.00</span>
         </div>
-        <button class="checkout-btn" id="submitOrderBtn" disabled>Proceed to Checkout</button>
+        <button class="checkout-btn" id="submitOrderBtn" type="submit" form="checkoutForm" disabled>Place order</button>
       </div>
     </div>
   </div>
 
-  <!-- Notification Toast -->
-  <div class="toast hidden" id="toast"></div>
-
-  <script src="app.js"></script>
+  <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

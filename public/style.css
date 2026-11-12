@@ -87,6 +87,12 @@ body {
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+.status-pill.is-admin {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
 .cart-btn, .admin-nav-btn {
   display: flex;
   align-items: center;
@@ -261,18 +267,36 @@ body {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
   display: flex;
-  flex-direction: column;
   transition: all 0.25s ease;
-  cursor: pointer;
+  overflow: hidden;
 }
 
-.product-card:hover {
+.product-card:hover,
+.product-card:focus-within {
   transform: translateY(-4px);
   background-color: var(--bg-card);
   border-color: rgba(59, 130, 246, 0.5);
   box-shadow: var(--shadow-main);
+}
+
+.product-card-button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  padding: 1.5rem;
+  text-align: left;
+  width: 100%;
+}
+
+.product-card-button:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: -2px;
 }
 
 .product-icon-wrap {
@@ -297,12 +321,14 @@ body {
 }
 
 .product-name {
+  display: block;
   font-size: 1.15rem;
   font-weight: 700;
   margin: 0.25rem 0 0.5rem 0;
 }
 
 .product-desc {
+  display: block;
   font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.4;
@@ -727,4 +753,588 @@ body {
   box-shadow: var(--shadow-main);
   z-index: 2000;
   font-weight: 600;
+  max-width: min(420px, calc(100vw - 2rem));
+}
+
+/* ==========================================================================
+   Shared utilities
+   ========================================================================== */
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  color: var(--accent-cyan);
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  background-color: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.noscript-banner {
+  background-color: rgba(245, 158, 11, 0.15);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--accent-amber);
+  font-weight: 600;
+  padding: 0.85rem 1.5rem;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Loading / empty / error states
+   ========================================================================== */
+
+.loading-state,
+.empty-state,
+.error-state {
+  background-color: rgba(24, 34, 52, 0.4);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.loading-state {
+  grid-column: 1 / -1;
+}
+
+.empty-state p,
+.error-state p {
+  margin-bottom: 0.35rem;
+}
+
+.empty-hint,
+.error-detail {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.error-state {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: var(--accent-red);
+}
+
+.empty-state .refresh-btn,
+.error-state .refresh-btn {
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+   Product detail modal
+   ========================================================================== */
+
+.product-icon-lg {
+  font-size: 3.5rem;
+  height: 86px;
+  width: 86px;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 0.25rem 0 0.6rem;
+}
+
+.modal-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+}
+
+.price-panel {
+  align-items: center;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+}
+
+.price-panel-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.price-panel-right {
+  text-align: right;
+}
+
+.price-label {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.price-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.price-value.is-out {
+  color: var(--accent-red);
+}
+
+/* ==========================================================================
+   Cart details & receipt
+   ========================================================================== */
+
+.cart-empty {
+  color: var(--text-muted);
+  padding: 2.5rem 0;
+  text-align: center;
+}
+
+.cart-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cart-empty-hint {
+  font-size: 0.82rem;
+  margin-top: 0.35rem;
+}
+
+.cart-item-icon {
+  font-size: 1.5rem;
+}
+
+.cart-item-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.cart-item-unit {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.cart-item-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.qty-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 16px;
+  text-align: center;
+}
+
+.qty-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.line-total {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.order-result-box {
+  padding-top: 0.25rem;
+}
+
+.receipt-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.receipt-title {
+  color: var(--accent-green);
+  font-size: 1.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.receipt-subtitle {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.receipt-status {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-top: 0.5rem;
+}
+
+.receipt {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: 1.5rem;
+  padding: 1rem;
+  text-align: left;
+}
+
+.receipt-meta {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 0.65rem;
+}
+
+.receipt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.receipt-row {
+  display: flex;
+  font-size: 0.85rem;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.receipt-row span:last-child {
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+
+.receipt-total {
+  border-top: 1px dashed var(--border-color);
+  color: var(--text-main);
+  display: flex;
+  font-weight: 800;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.receipt-total span:last-child {
+  color: var(--accent-cyan);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.receipt-note {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.order-success-card .checkout-btn {
+  margin-top: 1.5rem;
+}
+
+.form-hint {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin: -0.4rem 0 1rem;
+}
+
+/* ==========================================================================
+   Admin toolbar & diagnostics
+   ========================================================================== */
+
+.admin-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.filter-input,
+.filter-select {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 0.88rem;
+  padding: 0.6rem 0.85rem;
+}
+
+.filter-input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.filter-input::placeholder {
+  color: var(--text-muted);
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  border-color: var(--accent-blue);
+  outline: none;
+}
+
+.diagnostics-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.diag-item {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.15rem;
+}
+
+.diag-label {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.diag-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.diag-value.is-ok {
+  color: var(--accent-green);
+}
+
+.diag-value.is-bad {
+  color: var(--accent-red);
+}
+
+/* ==========================================================================
+   Orders table details
+   ========================================================================== */
+
+.order-ref {
+  color: var(--accent-cyan);
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+.order-date,
+.customer-email {
+  color: var(--text-muted);
+  display: block;
+  font-size: 0.75rem;
+}
+
+.customer-name {
+  display: block;
+  font-weight: 700;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.order-item-line {
+  font-size: 0.82rem;
+}
+
+.order-total {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.btn-terminal.is-cancelled {
+  color: var(--accent-red);
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.app-footer {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+.footer-inner {
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  gap: 0.5rem 1.5rem;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 1.5rem;
+}
+
+.footer-inner strong {
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   Responsive layout
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .header-right {
+    flex-wrap: wrap;
+  }
+
+  .hero-section,
+  .admin-hero {
+    padding: 1.85rem;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-metrics {
+    flex-wrap: wrap;
+    gap: 1.25rem 2rem;
+  }
+
+  .admin-section {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .brand-tagline,
+  .status-pill {
+    display: none;
+  }
+
+  .main-container {
+    padding: 1.75rem 1rem;
+  }
+
+  .hero-section,
+  .admin-hero {
+    padding: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 1.45rem;
+  }
+
+  .hero-desc {
+    font-size: 0.92rem;
+  }
+
+  .hero-metrics {
+    gap: 1rem 1.5rem;
+  }
+
+  .metric-val {
+    font-size: 1.25rem;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-card {
+    padding: 1.5rem;
+  }
+
+  .cart-drawer {
+    max-height: 94vh;
+    width: 94%;
+  }
+
+  .cart-item-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .cart-item-actions {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .admin-section {
+    padding: 1.15rem;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .admin-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter-input {
+    min-width: 0;
+  }
+
+  .toast {
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    text-align: center;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    padding: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
